@@ -228,10 +228,5 @@ function calculate() {
         current = path[current];
     }
     route.unshift(sourceStation);
-
-    const fare = distances[destinationStation];
-
-    return route;//.join(' -> ');
-    //document.getElementById('route').textContent = route.join(' -> ');
-    //document.getElementById('fare').textContent = fare + ' units'; //
+    return route;
 }

@@ -19,9 +19,6 @@ public class MetroController {
     @PostMapping("/process")
     public String op(@ModelAttribute Request request, Model model)
     {
-            /*model.addAttribute("sourcest",request.getSource());
-            model.addAttribute("destst",request.getDest());
-            model.addAttribute("cho",request.getChoice());*/
         String choice = request.getChoice();
         String source = request.getSource();
         String dest = request.getDest();
