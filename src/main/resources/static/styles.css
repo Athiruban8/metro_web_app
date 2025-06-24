@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    background-image: url("/metro_bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.container {
+    max-width: 741px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: 75vh;
+    position: relative;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+p {
+    color: #666;
+}
+
+form {
+    text-align: center;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+}
+
+input[type="number"], input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+input[type="submit"] {
+    width: 100%;
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.green-text {
+    background-color: lawngreen;
+}
+
+.red-text {
+    background-color: red;
+}
+
+#metro-map {
+    width: 100%;
+    max-width: 741px;
+}
+
+.dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: black;
+}
+
+#mapcon {
+    position: relative;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
