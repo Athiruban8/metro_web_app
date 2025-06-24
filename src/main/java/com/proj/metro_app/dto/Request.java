@@ -1,4 +1,4 @@
-package com.proj.metro_app;
+package com.proj.metro_app.dto;
 
 public class Request {
     private String source;

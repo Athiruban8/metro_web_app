@@ -1,154 +1,44 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
 <head>
     <title>Metro Route Planner</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-image: url("/metro_bg.jpg");
-            background-size: cover; /* Ensure the background image covers the entire background */
-            background-repeat: no-repeat; /* Prevent the image from repeating */
-            background-position: center; /* Center the image horizontally and vertically */
-            background-attachment: fixed;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            /* Set the body's height to 100% of the viewport height */
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .container {
-            max-width: 741px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.85);
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            min-height: 75vh;
-            postition: relative;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        p {
-            color: #666;
-        }
-
-        form {
-            text-align: center;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-        }
-
-        input[type="number"], input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-
-        input[type="submit"] {
-            width: 100%;
-            background-color: #007BFF;
-            color: #fff;
-            padding: 10px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        #route {
-            font-weight: bold;
-            display:inline-block;
-            color: #333;
-        }
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            -moz-appearance: none;
-        }
-        .green-text{
-            background-color: lawngreen;
-        }
-        .red-text{
-            background-color: red;
-        }
-        #metro-map {
-            width: 100%;
-            max-width: 741px; /* Set the maximum width to control the image size */
-        }
-        .dot {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: black;
-        }
-        #mapcon {
-            position: relative;
-
-        }
-        /* Blinking animation */
-        @keyframes blink {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-    </style>
-
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <div class="container">
     <h1>Metro Route Planner</h1>
-    <form id="metroForm" action="process" method="POST">
-        <label for="choice">Select Action:</label>
-        <select id="choice" name="choice">
-            <option value="1">List All Stations in the Map</option>
-            <option value="2">Show the Metro Map</option>
-            <option value="3">Get Shortest Distance from Source to Destination</option>
-            <option value="4">Get Shortest Time to Reach from Source to Destination</option>
-            <option value="5">Get Shortest Path from Source to Destination</option>
-        </select>
+    <form id="metroForm" action="/process" method="POST">
         <label for="source">Enter Source Station:</label>
-        <select id="source" name="source"></select>
+        <select id="source" name="source" required style="cursor: pointer;">
+            <option value="" disabled selected>Select source</option>
+            <th:block th:each="station : ${stations}">
+                <option th:value="${station}" th:text="${station}"
+                        th:selected="${station == source}"></option>
+            </th:block>
+        </select>
+
         <label for="dest">Enter Destination Station:</label>
-        <select id="dest" name="dest"></select>
+        <select id="dest" name="dest" style="cursor: pointer;" required>
+            <option value="" disabled selected>Select destination</option>
+            <th:block th:each="station : ${stations}">
+                <option th:value="${station}" th:text="${station}"
+                        th:selected="${station == dest}"></option>
+            </th:block>
+        </select>
+
         <input type="submit" value="Go">
     </form>
-    <p id="stations" th:utext="${stations}"></p>
-    <p id="path" style="display: none;" th:utext="${path}">Path:</p>
-    <p id="mapLabel" style="display: none;"></p>
-    <p id="distance" th:utext="${distance}"></p>
-    <p id="time" th:utext="${time}"></p>
+    <div th:if="${path}">
+        <p th:text="${distance}"></p>
+        <p th:text="${time}"></p>
+    </div>
+
     <div id="mapContainer" style="display: none;">
         <img id="metroMap" src="/metro_map_new.jpg" alt="Metro Map" width="712">
     </div>
     <p id="route"></p>
-    <div id="mapcon" style="display: none;">
+    <div id="mapcon" style="display: block;">
         <img id="metro-map" src="/metro_map_new.jpg" alt="Metro Map" width="712">
         <div class="dot" id="St Thomas Mount~G" style="top: 854px; left: 324px; display: none"></div>
         <div class="dot" id="Alandur~BG" style="top: 796px; left: 265px;display: none"></div>
@@ -191,99 +81,20 @@
         <div class="dot" id="Park Town~R" style="top: 332px; left: 474px;display: none"></div>
     </div>
 </div>
-<!--<p th:utext="${map}">Map:
-    <img src="/metro_map.jpg">
-</p> -->
-<script src="/shortest.js"></script>
 <script src="/blink.js"></script>
-<script src="/path.js"></script>
-<script>
-    const stationIds = [
-        "St Thomas Mount~G", "Alandur~BG", "Ekkattuthangal~G", "Ashok Nagar~G", "Vadapalani~G",
-        "CMBT~G", "Koyambedu~G", "Thirumangalam~G", "Anna Nagar Tower~G", "Anna Nagar East~G",
-        "Shenoy Nagar~G", "Kilpauk~G", "Egmore~G", "Chennai Central~BGR", "Airport~B",
-        "Mennambakkam~B", "Guindy~B", "Little Mount~B", "Saidapet~B", "Teynampet~B", "AG DMS~B",
-        "Thousand Lights~B", "LIC~B", "High Court~B", "Mannadi~B", "Washermanpet~B",
-        "Medavakkam~O", "Perumbakkam~O", "Shollinganallur~O", "Perungudi~O", "Thoraipakkam~O",
-        "Velachery~R", "Taramani~R", "Thiruvanmyur~RO", "Adayar~R", "Light House~R", "Cheapuk~R",
-        "Park Town~R"
-    ];
-
-    const source = document.getElementById("source");
-    const dest = document.getElementById("dest");
-    // Dynamically create options for each station ID
-    stationIds.forEach(stationId => {
-        const option = document.createElement("option");
-        option.value = stationId;
-        option.text = stationId;
-        source.appendChild(option);
-        const destOption = document.createElement("option");
-        destOption.value = stationId;
-        destOption.text = stationId;
-        dest.appendChild(destOption);
-    });
-    function startBlinking(stationId) {
-        const stationDot = document.getElementById(stationId);
-        stationDot.style.animation = 'blink 1s infinite';
+<script src="/display_path.js"></script>
+<script th:inline="javascript">
+    let route = [[${path}]];
+    if (route.length > 1 && route[0] !== "No path found") {
+        document.getElementById("route").innerHTML = display_path(route);
+        route.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.display = "block";
+                startBlinking(id);
+            }
+        });
     }
-    function stopBlinking(stationId) {
-        const stationDot = document.getElementById(stationId);
-        stationDot.style.animation = 'none';
-    }
-    let res = [];
-
-    document.getElementById("metroForm").addEventListener("submit", async function(event) {
-        event.preventDefault();
-        const choice = document.getElementById("choice").value;
-        if(res.length!=0){
-            res.forEach(stopBlinking);
-            res.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.style.display = "none";
-                }
-            });
-        }
-        // Hide all sections
-        document.getElementById("stations").style.display = "none";
-        document.getElementById("path").style.display = "none";
-        document.getElementById("mapLabel").style.display = "none";
-        document.getElementById("mapContainer").style.display = "none";
-        document.getElementById("route").style.display = "none";
-        document.getElementById("mapcon").style.display = "none";
-        document.getElementById("time").style.display = "none";
-        document.getElementById("distance").style.display = "none";
-        if (choice === "1") {
-            document.getElementById("stations").style.display = "block";
-            document.getElementById("metroForm").submit();
-        } else if (choice === "2") {
-            document.getElementById("mapLabel").style.display = "block";
-            document.getElementById("mapContainer").style.display = "block";
-        }else if(choice === "3"){
-            document.getElementById("distance").style.display = "block";
-            document.getElementById("metroForm").submit();
-        }else if(choice === "4"){
-            document.getElementById("time").style.display = "block";
-            document.getElementById("metroForm").submit();
-        } else if (choice === "5") {
-            document.getElementById("route").innerHTML = '';
-            document.getElementById("mapcon").style.display = "block";
-            res = calculate();
-            const len = res.length;
-            document.getElementById("route").style.display = "block";
-            document.getElementById("route").innerHTML = path(res);
-            res.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.style.display = "block";
-                }
-            });
-            res.forEach(startBlinking);
-            startBlinking('Alandur~BG');
-        } else {
-            document.getElementById("metroForm").submit();
-        }
-    });
 </script>
 </body>
 </html>
